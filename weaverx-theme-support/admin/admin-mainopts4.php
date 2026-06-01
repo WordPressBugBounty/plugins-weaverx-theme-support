@@ -330,7 +330,7 @@ function weaverx_mainopts_custom(): void
 
         array('type' => 'submit'),
     );
-    if (version_compare(WEAVERX_VERSION, '6.2.0.90', '<')) {
+    if (version_compare(WEAVERX_VERSION, '7.0.1', '<')) {
         $opts[] = array(
             'name' => '<small>' . esc_html__('Disable Google Font Integration', 'weaver-xtreme' /*adm*/) . '</small>',
             'id' => 'disable_google_fonts',

@@ -1,7 +1,6 @@
 <?php
-// File refactored: 2026-02-27 admin-saverestore
 if (!defined('ABSPATH')) {
-	exit;
+    exit;
 } // Exit if accessed directly
 /* Weaver Xtreme - admin Save/Restore
  *  __ added - 12/10/14
@@ -11,7 +10,6 @@ if (!defined('ABSPATH')) {
 
 function weaverx_ts_admin_saverestore(): void
 {
-	$dir = __DIR__;
-	require_once $dir . '/admin-saverestore4.php';
-	weaverx_ts_admin_saverestore4();      // Legacy version
+    require_once(dirname(__FILE__) . '/admin-saverestore4.php');
+    weaverx_ts_admin_saverestore4();      // Legacy version
 }
