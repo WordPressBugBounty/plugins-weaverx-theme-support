@@ -11,7 +11,9 @@ if (!defined('ABSPATH')) {
 // ======================== Main Options > Top Level ========================
 function weaverx_admin_mainopts(): void
 {
-
-    require_once(dirname(__FILE__) . '/admin-mainopts4.php');
-    weaverx_admin_mainopts4();
+    // Split into 3 files for easier refactoring
+    require_once(dirname(__FILE__) . '/admin-mainopts-1.php');
+    require_once(dirname(__FILE__) . '/admin-mainopts-2.php');
+    require_once(dirname(__FILE__) . '/admin-mainopts-3.php');
+    weaverx_admin_mainopts_start();
 }

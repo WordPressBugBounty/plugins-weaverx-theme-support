@@ -8,10 +8,10 @@ Author: wpweaver
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: weaverx-theme-support
-Requires at least: 6.0
-Requires PHP: 7.2
-Tested up to: 6.5.1
-Stable tag: 6.5.1
+Requires at least: 6.6
+Requires PHP: 7.4
+Tested up to: 7.0
+Stable tag: 7.0
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,6 +75,9 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog =
+= 6.8.2 =
+* Update: WP 6.8.2 compatibility
+
 = 6.5.1 =
 * Update: problem with WP plugin repository
 

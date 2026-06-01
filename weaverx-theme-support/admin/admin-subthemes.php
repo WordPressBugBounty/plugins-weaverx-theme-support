@@ -1,6 +1,7 @@
 <?php
+// File refactored: 2026-02-27 - admin-subthemes
 if (!defined('ABSPATH')) {
-    exit;
+	exit;
 } // Exit if accessed directly
 /* Weaver Xtreme - admin Subtheme
  *
@@ -10,7 +11,6 @@ if (!defined('ABSPATH')) {
 
 function weaverx_admin_subthemes(): void
 {
-    require_once(dirname(__FILE__) . '/admin-subthemes4.php');
-    weaverx_admin_subthemes4();
+	require_once __DIR__ . '/admin-subthemes4.php';
+	weaverx_admin_subthemes4();
 }
-

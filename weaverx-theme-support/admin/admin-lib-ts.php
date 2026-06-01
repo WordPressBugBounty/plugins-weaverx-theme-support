@@ -1,5 +1,8 @@
 <?php
-
+// File refactored: 2026-03-26 12:44 (MST)
+if (!defined('ABSPATH')) {
+    exit;
+} // Exit if accessed directly
 // files needed to be loaded before any ts lib sapi interface actions
 //
 function weaverx_process_options_themes(): bool
@@ -7,22 +10,22 @@ function weaverx_process_options_themes(): bool
 
     if (weaverx_submitted('set_subtheme')) {    // invoked from Weaver Xtreme Subthemes tab (this file)
         if (isset($_POST['theme_picked'])) {
-            $theme = weaverx_filter_textarea($_POST['theme_picked']);
+            $theme = wp_filter_post_kses(wp_unslash($_POST['theme_picked']));
 
             if (weaverx_activate_subtheme($theme)) {
-                weaverx_save_msg(__("Subtheme Selected: ", 'weaver-xtreme' /*adm*/) . $theme);
+                weaverx_save_msg(__("Subtheme Selected: ",  'weaverx-theme-support'/*adm*/) . $theme);
             } else {
-                weaverx_save_msg(__("Invalid Subtheme file detected. Your installation of Weaver Xtreme may be broken.", 'weaver-xtreme' /*adm*/));
+                weaverx_save_msg(__("Invalid Subtheme file detected. Your installation of Weaver Xtreme may be broken.",  'weaverx-theme-support'/*adm*/));
             }
         } else {
-            weaverx_save_msg(__("Please select a subtheme.", 'weaver-xtreme' /*adm*/));
+            weaverx_save_msg(__("Please select a subtheme.",  'weaverx-theme-support'/*adm*/));
         }
 
         return true;
     }
 
     if (weaverx_submitted('save_mytheme')) {    // invoked from Save/Restore tab
-        weaverx_save_msg(__("Current settings saved in WordPress database.", 'weaver-xtreme' /*adm*/));
+        weaverx_save_msg(__("Current settings saved in WordPress database.",  'weaverx-theme-support'/*adm*/));
         global $weaverx_opts_cache;
         if (!$weaverx_opts_cache) {
             $func_opt = WEAVER_GET_OPTION;
@@ -46,23 +49,12 @@ function weaverx_process_options_themes(): bool
             $weaverx_opts_cache = $saved;
             weaverx_wpupdate_option(WEAVER_SETTINGS_NAME, $weaverx_opts_cache);
         }
-        weaverx_save_msg(__("Current settings restored from WordPress database.", 'weaver-xtreme' /*adm*/));
+        weaverx_save_msg(__("Current settings restored from WordPress database.",  'weaverx-theme-support'/*adm*/));
 
         return true;
     }
 
-    if (weaverx_submitted('remove_v5_settings')) {    // invoked from Save/Restore tab
-        // unlink css files for editor
-        $save_dir = weaverx_f_uploads_base_dir() . '/weaverx5-subthemes';
-        @unlink($save_dir . '/style-weaverxt.css');
-        @unlink($save_dir . '/block-editor-style-wvrx.css');
-        @unlink($save_dir . '/editor-early-style-wvrx.css');
-        @rmdir($save_dir);
-        delete_option('weaverx5_settings');
-        weaverx_save_msg(__("Weaver Xtreme 5 Beta settings and style files deleted.", 'weaver-xtreme' /*adm*/));
-
-        return true;
-    }
+    // Removed v5_settings code for V7 - harmless, unlikely
 
     if (weaverx_submitted('hide_thumbs')) {
         $hide = weaverx_getopt('_hide_theme_thumbs');
@@ -77,10 +69,10 @@ function weaverx_process_options_themes(): bool
     }
     if (weaverx_submitted('reset_weaverx')) {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have the capability to do that.', 'weaver-xtreme' /*adm*/));
+            wp_die(esc_html__('You do not have the capability to do that.',  'weaverx-theme-support'/*adm*/));
         }
         // delete everything!
-        weaverx_save_msg(__('All Weaver Xtreme settings have been reset to the defaults.', 'weaver-xtreme'));
+        weaverx_save_msg(__('All Weaver Xtreme settings have been reset to the defaults.',  'weaverx-theme-support'));
         delete_option(apply_filters('weaverx_options', WEAVER_SETTINGS_NAME));
         global $weaverx_opts_cache;
         $weaverx_opts_cache = false;    // clear the cache
@@ -369,7 +361,7 @@ function weaverx_fix_type($type)
 function weaverx_form_inactive($value, $reason = ''): void
 {
     if ($reason == '') {
-        $reason = '<small>' . esc_html__('Weaver Xtreme Plus Options', 'weaver-xtreme' /*adm*/) . '&nbsp;</small>';
+        $reason = '<small>' . esc_html__('Weaver Xtreme Plus Options',  'weaverx-theme-support'/*adm*/) . '&nbsp;</small>';
     }
     if (!isset($value['name']) || !isset($value['id']) || !isset($value['info'])) {     // probably an '=submit'
         return;
@@ -384,14 +376,14 @@ function weaverx_form_inactive($value, $reason = ''): void
     echo '  <tr>' . "\n";
     ?>
     <th scope="row" style="width:200px;"><?php /* NO SAPI SETTING */
-        echo '<span style="color:#777;float:right;">' . $title . ':&nbsp;</span>';
+        echo '<span style="color:#777;float:right;">' . wp_kses_post( $title ) . ':&nbsp;</span>';
         if (!empty($value['help'])) {
-            weaverx_help_link($value['help'], esc_html__('Help for ', 'weaver-xtreme' /*adm*/) . $title);
+            weaverx_help_link($value['help'], esc_html__('Help for ',  'weaverx-theme-support'/*adm*/) . wp_strip_all_tags($title));
         }
         ?>
     </th>
-    <td style="color:#777;"><?php echo $reason; ?>
-        <input type="hidden" name="<?php weaverx_sapi_main_name($value['id']); ?>" id="<?php echo $value['id']; ?>"
+    <td style="color:#777;"><?php echo wp_kses_post( $reason ); ?>
+        <input type="hidden" name="<?php weaverx_sapi_main_name($value['id']); ?>" id="<?php echo esc_attr( $value['id'] ); ?>"
                value="<?php if (weaverx_getopt($value['id']) != "") {
                    weaverx_esc_textarea(weaverx_getopt($value['id']));
                } else {
@@ -401,7 +393,7 @@ function weaverx_form_inactive($value, $reason = ''): void
     <?php
     if ($value['info'] != '') {
         echo('<td style="padding-left:10px;color:#777;font-size:x-small;">');
-        echo $value['info'];
+        echo wp_kses_post( $value['info'] );
         echo("</td>\n");
     }
     ?>
@@ -420,12 +412,12 @@ function weaverx_echo_name($value, $add_icon = ''): void
         $icon = ' ';
     }
     if (strlen($l) > 4 && $l[0] == '#') {
-        echo '<span style="color:' . substr($l, 0, 4) .
-            ';">' . substr($l, 4) . '</span>';
+        echo '<span style="color:' . esc_attr( substr( $l, 0, 4 ) ) .
+            ';">' . wp_kses_post( substr( $l, 4 ) ) . '</span>';
     } elseif ($icon[0] == '-') {                      // add a leading icon
-        echo '<span class="dashicons dashicons-' . substr($icon, 1) . '">' . $l . '</span>';
+        echo '<span class="dashicons dashicons-' . esc_attr( substr( $icon, 1 ) ) . '">' . wp_kses_post( $l ) . '</span>';
     } else {
-        echo $l;
+        echo wp_kses_post( $l );
     }
 }
 
@@ -453,19 +445,19 @@ function weaverx_form_ctext($value, $val_only = false): void
         <th scope="row"><?php weaverx_echo_name($value, $add_icon); ?>:&nbsp;</th>
         <td> <?php
     } else {
-        echo '&nbsp;<small>' . $value['info'] . '</small>&nbsp;';
+        echo '&nbsp;<small>' . wp_kses_post( $value['info'] ) . '</small>&nbsp;';
     } ?>
-    <input class="<?php echo $pclass; ?>" name="<?php weaverx_sapi_main_name($value['id']); ?>"
-           id="<?php echo $value['id']; ?>" type="text" style="width:90px"
+    <input class="<?php echo esc_attr( $pclass ); ?>" name="<?php weaverx_sapi_main_name($value['id']); ?>"
+           id="<?php echo esc_attr( $value['id'] ); ?>" type="text" style="width:90px"
            value="<?php if (weaverx_getopt($value['id']) != "") {
                weaverx_esc_textarea(weaverx_getopt($value['id']));
            } else {
                echo '';
            } ?>"/>
     <?php
-    echo $img_css; ?>
+    echo wp_kses_post( $img_css ); ?>
     <a href="javascript:void(null);"
-       onclick="weaverx_ToggleRowCSS(document.getElementById('<?php echo $css_id . '_js'; ?>'), this, '<?php echo $img_show; ?>', '<?php echo $img_hide; ?>')"><?php echo '<img src="' . esc_url($img_toggle) . '" alt="toggle css" />'; ?></a>
+       onclick="weaverx_ToggleRowCSS(document.getElementById('<?php echo esc_js( $css_id . '_js' ); ?>'), this, '<?php echo esc_js( $img_show ); ?>', '<?php echo esc_js( $img_hide ); ?>')"><?php echo '<img src="' . esc_url($img_toggle) . '" alt="toggle css" />'; ?></a>
     <?php if (!$val_only) { ?>
     </td>
     <?php weaverx_form_info($value);
@@ -477,16 +469,16 @@ function weaverx_form_ctext($value, $val_only = false): void
         $css_rows = 1;
     }
     if ($css_id_text && !weaverx_getopt('_hide_auto_css_rules')) { ?>
-        <tr id="<?php echo $css_id . '_js'; ?>">
+        <tr id="<?php echo esc_attr( $css_id . '_js' ); ?>">
             <th scope="row"><span
-                        style="color:#22a;"><small><?php esc_html_e('Custom CSS styling:', 'weaver-xtreme' /*adm*/); ?></small></span>
+                        style="color:#22a;"><small><?php esc_html_e('Custom CSS styling:',  'weaverx-theme-support'/*adm*/); ?></small></span>
             </th>
             <td><small>&nbsp;</small></td>
             <td>
                 <small>
-                    <?php echo wp_kses_post(__('You can enter CSS rules, enclosed in {}\'s, and separated by <strong>;</strong>. See ', 'weaver-xtreme' /*adm*/)); ?>
-                    <a href="<?php echo $help_file; ?>"
-                       target="_blank"><?php esc_html_e('CSS Help', 'weaver-xtreme' /*adm*/); ?></a> <?php _e('for more details.', 'weaver-xtreme' /*adm*/); ?>
+                    <?php echo wp_kses_post(__('You can enter CSS rules, enclosed in {}\'s, and separated by <strong>;</strong>. See ',  'weaverx-theme-support'/*adm*/)); ?>
+                    <a href="<?php echo esc_url( $help_file ); ?>"
+                       target="_blank"><?php esc_html_e('CSS Help',  'weaverx-theme-support'/*adm*/); ?></a> <?php esc_html_e('for more details.',  'weaverx-theme-support'/*adm*/); ?>
                 </small><br/>
                 <?php weaverx_textarea($css_id_text, $css_id, $css_rows, '{ font-size:150%; font-weight:bold; } /* for example */'); ?>
             </td>
@@ -494,17 +486,16 @@ function weaverx_form_ctext($value, $val_only = false): void
         <?php
     } else {
         ?>
-        <tr id="<?php echo $css_id . '_js'; ?>" style="display:none;">
+        <tr id="<?php echo esc_attr( $css_id . '_js' ); ?>" style="display:none;">
             <th scope="row"><span
-                        style="color:green;"><small><?php esc_html_e('Custom CSS styling:', 'weaver-xtreme' /*adm*/); ?></small></span>
+                        style="color:green;"><small><?php esc_html_e('Custom CSS styling:',  'weaverx-theme-support'/*adm*/); ?></small></span>
             </th>
             <td><small>&nbsp;</small></td>
             <td>
                 <small>
-                    <?php esc_html_e('You can enter CSS rules, enclosed in {}\'s, and separated by <strong>;</strong>. See', 'weaver-xtreme' /*adm*/); ?>
-                    <a href="<?php echo $help_file; ?>"
-                       target="_blank"><?php esc_html_e('CSS Help', 'weaver-xtreme' /*adm*/); ?></a> for more
-                    details.</small><br/>
+                    <?php echo wp_kses_post( __( 'You can enter CSS rules, enclosed in {}\'s, and separated by <strong>;</strong>. See', 'weaverx-theme-support' ) ); ?>
+                    <a href="<?php echo esc_url( $help_file ); ?>"
+                       target="_blank"><?php esc_html_e('CSS Help',  'weaverx-theme-support'/*adm*/); ?></a> <?php esc_html_e( 'for more details.', 'weaverx-theme-support' ); ?></small><br/>
                 <?php weaverx_textarea($css_id_text, $css_id, $css_rows, '{ font-size:150%; font-weight:bold; } /* for example */'); ?>
             </td>
         </tr>
@@ -526,10 +517,16 @@ function weaverx_textarea($text, $id, $rows = 0, $place = '', $style = 'width:85
     if ($rows > 25) {
         $rows = 25;
     }
-    if ($filter) {
-        $text = weaverx_esc_textarea($text, false);
-    }    // don't echo
-    echo "<textarea class='$class' placeholder='$place' name='$name' rows='$rows' style='$style'>$text</textarea>\n";
+
+    printf(
+        '<textarea class="%s" placeholder="%s" name="%s" rows="%d" style="%s">%s</textarea>' . "\n",
+        esc_attr( $class ),
+        esc_attr( $place ),
+        esc_attr( $name ),
+        absint( $rows ),
+        esc_attr( $style ),
+        esc_textarea($text) // Already escaped via weaverx_esc_textarea which calls esc_textarea
+    );
 }
 
 
@@ -545,10 +542,10 @@ function weaverx_form_color($value, $val_only = false): void
         </th>
         <td>
     <?php } else {
-        echo '&nbsp;<small>' . $value['info'] . '</small>&nbsp;';
+        echo '&nbsp;<small>' . wp_kses_post( $value['info'] ) . '</small>&nbsp;';
     } ?>
-    <input class="<?php echo $pclass; ?>" name="<?php weaverx_sapi_main_name($value['id']); ?>"
-           id="<?php echo $value['id']; ?>" type="text" style="width:90px"
+    <input class="<?php echo esc_attr( $pclass ); ?>" name="<?php weaverx_sapi_main_name($value['id']); ?>"
+           id="<?php echo esc_attr( $value['id'] ); ?>" type="text" style="width:90px"
            value="<?php if (weaverx_getopt($value['id']) != "") {
                weaverx_esc_textarea(weaverx_getopt($value['id']));
            } else {
@@ -580,7 +577,9 @@ function weaverx_form_header($value, $narrow = false): void
             if ($icon[0] == '-') {                      // add a leading icon
                 $dash = '<span style="padding: .1em .5em 0 .2em" class="dashicons dashicons-' . substr($icon, 1) . '"></span>';
             }
-            echo weaverx_anchor($value['name']) . $dash . '<span style="font-weight:bold; font-size: larger;"><em>' . $value['name'] . '</em></span>';
+            echo wp_kses_post(weaverx_anchor($value['name']));
+			echo wp_kses_post( $dash );
+			echo wp_kses_post('<span style="font-weight:bold; font-size: larger;"><em>' . $value['name'] . '</em></span>');
             weaverx_form_help($value);
             ?>
         </th>
@@ -593,7 +592,7 @@ function weaverx_form_header($value, $narrow = false): void
 
         if ($value['info'] != '') {
             echo('<td style="padding-left: 10px"><u><em><strong>');
-            echo $value['info'];
+            echo wp_kses_post( $value['info'] );
             echo("</strong></em></u></td>\n");
         }
         ?>
@@ -635,7 +634,9 @@ function weaverx_form_subheader($value): void
                 $dash = '<span style="padding:.2em;" class="dashicons dashicons-' . substr($icon, 1) . '"></span>';
             }
 
-            echo weaverx_anchor($value['name']) . $dash . '<span style="color:blue; font-weight:bold; "><em><u>' . $value['name'] . '</u></em></span>';
+            echo wp_kses_post(weaverx_anchor($value['name']));
+			echo wp_kses_post( $dash );
+			echo wp_kses_post('<span style="color:blue; font-weight:bold; "><em><u>' . $value['name'] . '</u></em></span>');
             weaverx_form_help($value);
             ?>
         </th>
@@ -643,7 +644,7 @@ function weaverx_form_subheader($value): void
         <?php
         if ($value['info'] != '') {
             echo('<td style="padding-left: 10px"><u><em>');
-            echo $value['info'];
+            echo wp_kses_post( $value['info'] );
             echo("</em></u></td>\n");
         }
         ?>
@@ -671,7 +672,9 @@ function weaverx_form_subheader_alt($value): void
             if ($icon[0] == '-') {                      // add a leading icon
                 $dash = '<span style="padding:.2em;" class="dashicons dashicons-' . substr($icon, 1) . '"></span>';
             }
-            echo weaverx_anchor($value['name']) . $dash . '<span style="color:blue; font-weight:bold;padding-left:5px;"><em>' . $value['name'] . '</em></span>';
+            echo wp_kses_post(weaverx_anchor($value['name']));
+			echo wp_kses_post( $dash );
+			echo wp_kses_post('<span style="color:blue; font-weight:bold;padding-left:5px;"><em>' . $value['name'] . '</em></span>');
             weaverx_form_help($value);
             ?>
         </th>
@@ -679,7 +682,7 @@ function weaverx_form_subheader_alt($value): void
         <?php
         if (isset($value['info']) && $value['info'] != '') {
             echo('<td style="padding-left: 10px;color:blue;">');
-            echo $value['info'];
+            echo wp_kses_post( $value['info'] );
             echo("</td>\n");
         }
         ?>
@@ -708,7 +711,9 @@ function weaverx_form_header_area($value): void
                 $dash = '<span style="padding:.2em;" class="dashicons dashicons-' . substr($icon, 1) . '"></span>';
             }
 
-            echo weaverx_anchor($value['name']) . $dash . '<span style="color:blue; font-weight:bold;padding-left:5px;font-size:small;"><em>' . $value['name'] . '</em></span>';
+            echo wp_kses_post(weaverx_anchor($value['name']));
+			echo wp_kses_post( $dash );
+			echo wp_kses_post('<span style="color:blue; font-weight:bold;padding-left:5px;font-size:small;"><em>' . $value['name'] . '</em></span>');
             weaverx_form_help($value);
             ?>
         </th>
@@ -716,7 +721,7 @@ function weaverx_form_header_area($value): void
         <?php
         if ($value['info'] != '') {
             echo('<td style="padding-left: 10px;color:blue;">');
-            echo $value['info'];
+            echo wp_kses_post( $value['info'] );
             echo("</td>\n");
         }
         ?>
@@ -749,12 +754,12 @@ function weaverx_loadtheme(): void
 
     $errors[] = '';
     if ($filename == "") {
-        $errors[] = esc_html__('You didn\'t select a file to upload.', 'weaver-xtreme' /*adm*/) . "<br />";
+        $errors[] = esc_html__('You didn\'t select a file to upload.',  'weaverx-theme-support'/*adm*/) . "<br />";
         $ok = false;
     }
 
     if ($ok && $ext_check != 'wxt' && $ext_check != 'wxb') {
-        $errors[] = wp_kses_post(__('Theme files must have <em>.wxt</em> or <em>.wxb</em> extension.', 'weaver-xtreme' /*adm*/)) . '<br />';
+        $errors[] = wp_kses_post(__('Theme files must have <em>.wxt</em> or <em>.wxb</em> extension.',  'weaverx-theme-support'/*adm*/)) . '<br />';
         $ok = false;
     }
 
@@ -762,16 +767,16 @@ function weaverx_loadtheme(): void
         if (!weaverx_f_exists($openname)) {
             $errors[] = '<strong><em style="color:red;">' .
                 esc_html__('Sorry, there was a problem uploading your file.
-You may need to check your folder permissions or other server settings.', 'weaver-xtreme' /*adm*/) .
-                '</em></strong><br />(' . esc_html__('Trying to use file', 'weaver-xtreme' /*adm*/) . ' <em>' . $openname . '</em>)';
+You may need to check your folder permissions or other server settings.',  'weaverx-theme-support'/*adm*/) .
+                '</em></strong><br />(' . esc_html__('Trying to use file',  'weaverx-theme-support'/*adm*/) . ' <em>' . $openname . '</em>)';
             $ok = false;
         }
     }
     if (!$ok) {
         echo '<div id="message" class="updated fade"><p><strong><em style="color:red;">' .
-            esc_html__('ERROR', 'weaver-xtreme' /*adm*/) . '</em></strong></p><p>';
+            esc_html__('ERROR',  'weaverx-theme-support'/*adm*/) . '</em></strong></p><p>';
         foreach ($errors as $error) {
-            echo $error . '<br />';
+            echo wp_kses_post( $error ) . '<br />';
         }
         echo '</p></div>';
     } else {    // OK - read file and save to My Saved Theme
@@ -781,10 +786,10 @@ You may need to check your folder permissions or other server settings.', 'weave
         if (!weaverx_ex_set_current_to_serialized_values($contents)) {
             echo '<div id="message" class="updated fade"><p><strong><em style="color:red;">' .
                 esc_html__('Sorry, there was a problem uploading your file.
-The file you picked was not a valid Weaver Xtreme theme file.', 'weaver-xtreme' /*adm*/) .
+The file you picked was not a valid Weaver Xtreme theme file.',  'weaverx-theme-support'/*adm*/) .
                 '</em></strong></p></div>';
         } else {
-            weaverx_save_msg(__('Weaver Xtreme theme options reset to uploaded theme.', 'weaver-xtreme' /*adm*/));
+            weaverx_save_msg(__('Weaver Xtreme theme options reset to uploaded theme.',  'weaverx-theme-support'/*adm*/));
         }
     }
 }
@@ -794,7 +799,7 @@ function weaverx_ex_set_current_to_serialized_values($contents): bool
     global $weaverx_opts_cache;    // need to mess with the cache
 
     if ( !weaverx_ts_allow_file_read()) {
-        return weaverx_f_fail(__("Unable to read settings without SuperAdmin access.", 'weaver-xtreme' /*adm*/));
+        return weaverx_f_fail(__("Unable to read settings without SuperAdmin access.",  'weaverx-theme-support'/*adm*/));
     }
 
     if (substr($contents, 0, 10) == 'WXT-V01.00' || substr($contents, 0, 10) != 'WVA-V01.00') {
@@ -804,14 +809,14 @@ function weaverx_ex_set_current_to_serialized_values($contents): bool
     } else {
         $val = substr($contents, 0, 10);
 
-        return weaverx_f_fail(__("Wrong theme file format version", 'weaver-xtreme' /*adm*/) . ':' . $val);    /* simple check for one of ours */
+        return weaverx_f_fail(__("Wrong theme file format version",  'weaverx-theme-support'/*adm*/) . ':' . $val);    /* simple check for one of ours */
     }
 
     $restore = array();
     $restore = unserialize(substr($contents, 10));
 
     if (!$restore) {
-        return weaverx_f_fail(__("Unserialize failed", 'weaver-xtreme' /*adm*/));
+        return weaverx_f_fail(__("Unserialize failed",  'weaverx-theme-support'/*adm*/));
     }
 
     $version = weaverx_getopt('weaverx_version_id');    // get something to force load
@@ -896,6 +901,7 @@ if (version_compare(WEAVERX_VERSION, '4.9.0', '>=')) {
                 $out = esc_textarea($text);
             }
             if ($echo) {
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $out is already escaped using esc_textarea().
                 echo $out;
 
                 return '';
@@ -911,11 +917,10 @@ if (version_compare(WEAVERX_VERSION, '4.9.0', '>=')) {
             ?>
             &nbsp;&larr; &nbsp;
             <a style='text-decoration:none;'
-               title="<?php echo esc_html__('Select image from Media Library. Click \'Insert into Post\' to paste url here.', 'weaver-xtreme'); ?>"
-               href="javascript:weaverx_media_lib( '<?php echo $fillin; ?>' );"><span
+               title="<?php echo esc_html__('Select image from Media Library. Click \'Insert into Post\' to paste url here.',  'weaverx-theme-support'); ?>"
+               href="javascript:weaverx_media_lib( '<?php echo esc_js( $fillin ); ?>' );"><span
                         style="font-size:16px;margin-top:2px;" class="dashicons dashicons-format-image"></span></a>
             <?php
         }
     }
 }
-

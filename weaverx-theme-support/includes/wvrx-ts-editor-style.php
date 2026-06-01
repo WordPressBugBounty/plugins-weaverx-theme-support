@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+} // Exit if accessed directly
 // ======================================= MCE CSS FILE GENERATION ================================
 
 /**
@@ -28,30 +31,37 @@ function weaverx_ts_save_editor_css(string $usename, string $editor): string
 
     $theme_dir_exists = wp_mkdir_p($save_dir);    // direct to wp mkdir
     if (!$theme_dir_exists) {
-        weaverx_f_file_access_fail(__('Unable to create directory to save editor style file. Probably a file system permission problem. Directory', 'weaver-xtreme' /*adm*/) . $save_dir);
+        weaverx_f_file_access_fail(__('Unable to create directory to save editor style file. Probably a file system permission problem. Directory', 'weaverx-theme-support' /*adm*/) . $save_dir);
         return '';
     }
 
-    $theme_dir_writable = $theme_dir_exists;
+    global $wp_filesystem;
 
-    if (!@is_writable($save_dir)) {        // direct php access
-        weaverx_f_file_access_fail(__('Directory not writable to save editor style file. Probably a file system permission problem. Directory: ', 'weaver-xtreme' /*adm*/) . $save_dir);
+    if (!function_exists('WP_Filesystem')) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+    }
+
+    if (!WP_Filesystem()) {
         return '';
     }
 
-    $filename = $save_dir . '/' . $usename;    // we will add txt
-
-    if (!$theme_dir_writable || !$theme_dir_exists || !($handle = fopen($filename, 'w'))) {    // Direct php
-        weaverx_f_file_access_fail(__('Unable to create editor style file. Probably a file system permission problem. File: ', 'weaver-xtreme' /*adm*/) . $filename);
+// Check writable
+    if (!$wp_filesystem->is_writable($save_dir)) {
+        weaverx_f_file_access_fail(__('Directory not writable to save editor style file. Probably a file system permission problem. Directory: ', 'weaverx-theme-support' /*adm*/) . $save_dir);
         return '';
     }
 
-    fwrite($handle, weaverx_ts_output_edit_style($editor));        // this is where the real work happens
+    $filename = $save_dir . '/' . $usename;
 
-    if (!fclose($handle)) {
-        weaverx_f_file_access_fail(__('Unable to create editor css file. Probably a file system permission problem. File: ', 'weaver-xtreme' /*adm*/) . $filename);
+// Generate content first (same behavior as fwrite source)
+    $content = weaverx_ts_output_edit_style($editor);
+
+// Write file (replaces fopen/fwrite/fclose)
+    if (!$wp_filesystem->put_contents($filename, $content, FS_CHMOD_FILE)) {
+        weaverx_f_file_access_fail(__('Unable to create editor style file. Probably a file system permission problem. File: ', 'weaverx-theme-support' /*adm*/) . $filename);
         return '';
     }
+
 
     return $save_url . '/' . $usename;
 }
