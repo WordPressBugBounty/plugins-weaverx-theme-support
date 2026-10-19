@@ -8,10 +8,10 @@ Author: wpweaver
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: weaverx-theme-support
-Requires at least: 5.7
-Requires PHP: 7.3
-Tested up to: 7.0
-Stable tag: 7.0.1
+Requires at least: 6.6
+Requires PHP: 7.4
+Tested up to: 7.1
+Stable tag: 7.1
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,6 +75,34 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog =
+= 7.1 =
+* Update: fix i/o sanitization
+* Update: significant code refactor
+
+= 7.0 =
+* No changelog...
+
+= 6.8.2 =
+* Update: WP 6.8.2 compatibility
+
+= 6.5.1 =
+* Update: problem with WP plugin repository
+
+= 6.5 =
+* Update: WP 6.5 compatibility
+* Fix: [div] and [span] shortcodes
+
+= 6.4 =
+* Update: WP 6.4 compatibility
+* Tweak: Text Widge output formatting
+
+= 6.3.1 =
+* Tweak: Additional Multisite Super Admin validation
+
+= 6.3.0 =
+* Update: WP 6.3 compatibility
+* Tweak: Multisite Super Admin validation
+
 = 6.2.10 =
 New: Added Huge Font Size choice to match Weaver Xtreme 6.2.1 Customizer choices
 
