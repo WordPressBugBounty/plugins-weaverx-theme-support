@@ -11,7 +11,7 @@ Text Domain: weaverx-theme-support
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 7.1
+Stable tag: 7.1.1
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,6 +75,9 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog =
+= 7.1.1 =
+* Update: the 7.1 upload to the WP repository was corrupted, this fixes it
+
 = 7.1 =
 * Update: fix i/o sanitization
 * Update: significant code refactor

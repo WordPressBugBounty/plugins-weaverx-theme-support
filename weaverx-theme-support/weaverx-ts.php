@@ -9,12 +9,12 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver Xtreme Theme Support - Includes Legacy Admin, plus useful shortcodes and widgets that match the theme..
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 7.1
+Version: 7.1.1
 License: GPL V3
 Requires PHP: 7.4
 Requires at least: 6.6
 Tested up to: 7.1
-Stable tag: 7.1
+Stable tag: 7.1.1
 
 Weaver Xtreme Theme Support
 
@@ -57,7 +57,7 @@ if (version_compare($wvrx_ts_php_version, '7.2', '<')) {
 if ($wvrx_ts_php_version_ok && (strpos($wvrx_ts_theme_dir, '/weaver-xtreme') !== false ||
 	strpos($wvrx_ts_theme_dir, '/weaver-xtreme-5') !== false )) {        // only load if Weaver Xtreme is the theme
 
-	define('WVRX_TS_VERSION', '7.1');
+	define('WVRX_TS_VERSION', '7.1.1');
 	define('WVRX_TS_PAGEBUILDERS', true);
 
 	function wvrx_ts_installed(): bool
